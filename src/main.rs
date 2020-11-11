@@ -8,12 +8,14 @@ use image::imageops::flip_vertical_in_place;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
 
+mod camera;
 mod color;
 mod hittable;
 mod hittable_list;
 mod math;
 mod ray;
 mod sphere;
+use crate::camera::*;
 use crate::color::Color;
 use crate::hittable::{HitRecord, Hittable};
 use crate::hittable_list::HittableList;
