@@ -1,10 +1,20 @@
 extern crate image;
 
-use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage};
+use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
 
+mod color;
 mod math;
+mod ray;
+use crate::color::Color;
 use crate::math::Vec3;
+use crate::ray::Ray;
+
+fn ray_color(r: &Ray) -> Color {
+  let unit_direction = r.direction().normalized();
+  let t = 0.5 * (unit_direction.y + 1.0);
+  Color((1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0))
+}
 
 fn main() {
   println!("Hello, world!");
@@ -19,11 +29,8 @@ fn main() {
       let r = (i as f32) / (image_width - 1) as f32;
       let g = (j as f32) / (image_height - 1) as f32;
       let b = 0.25;
-
-      let ir: u8 = (255.99 * r) as u8;
-      let ig: u8 = (255.99 * g) as u8;
-      let ib: u8 = (255.99 * b) as u8;
-      img.put_pixel(i, j, image::Rgb::<u8>([ir, ig, ib]));
+      let c = Color(Vec3::new(r, g, b));
+      img.put_pixel(i, j, c.into());
     }
     bar.inc(1);
   }
