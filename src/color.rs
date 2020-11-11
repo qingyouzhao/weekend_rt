@@ -22,7 +22,7 @@ impl From<Color> for image::Rgb<u8> {
 
 impl From<MultiSampleColor> for image::Rgb<u8> {
   fn from(c: MultiSampleColor) -> Self {
-    let scale = 1.0 / c.samples_per_pixel as f32;
+    let scale = 1.0 / c.samples_per_pixel as f64;
 
     image::Rgb::<u8>([
       (255.999 * clamp(c.color.x * scale, 0.0, 0.999)) as u8,

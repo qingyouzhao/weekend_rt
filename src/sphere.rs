@@ -5,11 +5,11 @@ use crate::ray::Ray;
 #[derive(Default, Copy, Clone)]
 pub struct Sphere {
   center: Point,
-  radius: f32,
+  radius: f64,
 }
 
 impl Sphere {
-  pub fn new(cen: Point, r: f32) -> Sphere {
+  pub fn new(cen: Point, r: f64) -> Sphere {
     Sphere {
       center: cen,
       radius: r,
@@ -18,7 +18,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-  fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+  fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
     // todo(qzhao): Can't we abstract this out with existing lib or math utils?
     let oc = r.origin() - self.center;
     let a = r.direction().mag_sq();

@@ -24,8 +24,8 @@ impl Ray {
     self.dir
   }
 
-  // todo Vec3 only support f32 not f64, let's figure out if this is a problem later
-  pub fn at(&self, t: f32) -> Point {
+  // todo Vec3 only support f64 not f64, let's figure out if this is a problem later
+  pub fn at(&self, t: f64) -> Point {
     self.orig + self.dir * t
   }
 }
