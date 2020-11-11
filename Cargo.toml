@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 image = "0.23.11"
+indicatif = "0.15.0"
+ultraviolet = "0.7.5"
