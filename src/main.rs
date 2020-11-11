@@ -7,10 +7,24 @@ mod color;
 mod math;
 mod ray;
 use crate::color::Color;
-use crate::math::Vec3;
+use crate::math::{Point, Vec3};
 use crate::ray::Ray;
 
+fn hit_sphere(center: &Point, radius: f32, r: &Ray) -> bool {
+  let oc = r.origin() - *center;
+  let a = r.direction().mag_sq();
+  let b = 2.0 * oc.dot(r.direction());
+  let c = oc.mag_sq() - radius * radius;
+  let discriminant = b * b - 4.0 * a * c;
+  discriminant > 0.0
+}
+
 fn ray_color(r: &Ray) -> Color {
+  let center = Vec3::new(0.0, 0.0, -1.0);
+  let radius = 0.5;
+  if hit_sphere(&center, radius, &r) {
+    return Color(Vec3::new(1.0, 0.0, 0.0));
+  }
   let unit_direction = r.direction().normalized();
   let t = 0.5 * (unit_direction.y + 1.0);
   Color((1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0))
