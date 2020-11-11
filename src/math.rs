@@ -38,8 +38,9 @@ impl Random for Vec3 {
 pub fn random_in_unit_sphere() -> Vec3 {
   loop {
     let p = Vec3::random_range(-1.0, 1.0);
-    if p.mag_sq() < 1.0 {
-      return p;
+    if p.mag_sq() >= 1.0 {
+      continue;
     }
+    return p;
   }
 }

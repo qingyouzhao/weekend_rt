@@ -23,10 +23,14 @@ use crate::math::*;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 
-fn ray_color(r: &Ray, world: Arc<dyn Hittable>) -> Vec3 {
+fn ray_color(r: &Ray, world: Arc<dyn Hittable>, depth: u32) -> Vec3 {
+  if depth == 0 {
+    return Vec3::zero();
+  }
   let mut rec = HitRecord::default();
-  if world.hit(&r, 0.0, INFINITY, &mut rec) {
-    return 0.5 * (rec.normal + Vec3::broadcast(1.0));
+  if world.hit(&r, 0.001, INFINITY, &mut rec) {
+    let target = rec.p + rec.normal + random_in_unit_sphere();
+    return 0.5 * ray_color(&Ray::new(&rec.p, &(target - rec.p)), world, depth - 1);
   }
   let unit_direction = r.direction().normalized();
   let t = 0.5 * (unit_direction.y + 1.0);
@@ -39,6 +43,7 @@ fn main() {
   let image_width: u32 = 400;
   let image_height: u32 = (image_width as f64 / aspect_rasio) as u32;
   let samples_per_pixel = 100;
+  let max_depth = 50;
 
   // World
   let mut world = Arc::new(HittableList::default());
@@ -67,7 +72,7 @@ fn main() {
         let u = (i as f64 + rng.gen::<f64>()) / (image_width as f64 - 1.0);
         let v = (j as f64 + rng.gen::<f64>()) / (image_height as f64 - 1.0);
         let r = cam.get_ray(u, v);
-        pixel_color.color += ray_color(&r, world.clone());
+        pixel_color.color += ray_color(&r, world.clone(), max_depth);
       }
       let mut img = arc_img.lock().unwrap();
       img.put_pixel(i, j, pixel_color.into());
