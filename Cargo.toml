@@ -11,3 +11,5 @@ image = "0.23.11"
 indicatif = "0.15.0"
 ultraviolet = "0.7.5"
 rand = "0.7.3"
+rayon = "1.5.0"
+
