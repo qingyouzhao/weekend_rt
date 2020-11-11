@@ -1,37 +1,30 @@
 extern crate image;
 
+use std::rc::Rc;
+
+use std::f32::INFINITY;
+
 use image::imageops::flip_vertical_in_place;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
 
 mod color;
+mod hittable;
+mod hittable_list;
 mod math;
 mod ray;
+mod sphere;
 use crate::color::Color;
-use crate::math::{Point, Vec3};
+use crate::hittable::{HitRecord, Hittable};
+use crate::hittable_list::HittableList;
+use crate::math::*;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 
-fn hit_sphere(center: &Point, radius: f32, r: &Ray) -> f32 {
-  let oc = r.origin() - *center;
-  let a = r.direction().mag_sq();
-  let b = 2.0 * oc.dot(r.direction());
-  let c = oc.mag_sq() - radius * radius;
-  let discriminant = b * b - 4.0 * a * c;
-  let hit = if discriminant < 0.0 {
-    -1.0
-  } else {
-    (-b - discriminant.sqrt()) / (2.0 * a)
-  };
-  hit
-}
-
-fn ray_color(r: &Ray) -> Color {
-  let center = Vec3::new(0.0, 0.0, -1.0);
-  let radius = 0.5;
-  let t = hit_sphere(&center, radius, &r);
-  if t > 0.0 {
-    let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalized();
-    return Color(0.5 * Vec3::new(n.x + 1.0, n.y + 1.0, n.z + 1.0));
+fn ray_color(r: &Ray, world: Rc<dyn Hittable>) -> Color {
+  let mut rec = HitRecord::default();
+  if world.hit(&r, 0.0, INFINITY, &mut rec) {
+    return Color(0.5 * (rec.normal + Vec3::broadcast(1.0)));
   }
   let unit_direction = r.direction().normalized();
   let t = 0.5 * (unit_direction.y + 1.0);
@@ -43,6 +36,11 @@ fn main() {
   let aspect_rasio = 16.0 / 9.0;
   let image_width: u32 = 400;
   let image_height: u32 = (image_width as f32 / aspect_rasio) as u32;
+
+  // World
+  let mut world = Rc::new(HittableList::default());
+  Rc::make_mut(&mut world).add(Rc::new(Sphere::new(-Vec3::unit_z(), 0.5)));
+  Rc::make_mut(&mut world).add(Rc::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
   // Camera
   let viewport_height = 2.0;
@@ -67,7 +65,7 @@ fn main() {
         &origin,
         &(lower_left_corner + u * horizontal + v * vertical - origin),
       );
-      let pixel_color = ray_color(&r);
+      let pixel_color = ray_color(&r, world.clone());
       img.put_pixel(i, j, pixel_color.into());
     }
     bar.inc(1);
