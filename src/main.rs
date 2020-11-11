@@ -29,7 +29,7 @@ fn ray_color(r: &Ray, world: Arc<dyn Hittable>, depth: u32) -> Vec3 {
   }
   let mut rec = HitRecord::default();
   if world.hit(&r, 0.001, INFINITY, &mut rec) {
-    let target = rec.p + rec.normal + random_in_unit_sphere();
+    let target = rec.p + rec.normal + Vec3::random_unit();
     return 0.5 * ray_color(&Ray::new(&rec.p, &(target - rec.p)), world, depth - 1);
   }
   let unit_direction = r.direction().normalized();

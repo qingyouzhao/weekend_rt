@@ -1,6 +1,5 @@
-use rand::distributions::Uniform;
 use rand::prelude::*;
-use rand::RngCore;
+use rand_distr::UnitSphere;
 
 pub type Vec3 = ultraviolet::DVec3;
 pub type Point = Vec3;
@@ -15,9 +14,10 @@ pub fn clamp<T: PartialOrd>(x: T, min: T, max: T) -> T {
   x
 }
 
-trait Random {
+pub trait Random {
   fn random() -> Self;
   fn random_range(min: f64, max: f64) -> Self;
+  fn random_unit() -> Self;
 }
 
 impl Random for Vec3 {
@@ -32,6 +32,10 @@ impl Random for Vec3 {
       rng.gen_range(min, max),
       rng.gen_range(min, max),
     )
+  }
+  fn random_unit() -> Vec3 {
+    let v = UnitSphere.sample(&mut rand::thread_rng());
+    Vec3::new(v[0], v[1], v[2])
   }
 }
 
