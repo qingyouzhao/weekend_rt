@@ -1,10 +1,15 @@
+use std::option::Option;
+use std::sync::Arc;
+
+use crate::material::Material;
 use crate::math::*;
 use crate::ray::Ray;
 
-#[derive(Default, Copy, Clone)]
+#[derive(Clone, Default)]
 pub struct HitRecord {
   pub p: Point,
   pub normal: Vec3,
+  pub mat_rc: Option<Arc<dyn Material>>,
   pub t: f64,
   pub front_face: bool,
 }

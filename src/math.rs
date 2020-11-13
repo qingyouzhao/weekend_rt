@@ -39,6 +39,7 @@ impl Random for Vec3 {
   }
 }
 
+#[allow(dead_code)]
 pub fn random_in_unit_sphere() -> Vec3 {
   loop {
     let p = Vec3::random_range(-1.0, 1.0);
@@ -47,4 +48,19 @@ pub fn random_in_unit_sphere() -> Vec3 {
     }
     return p;
   }
+}
+
+pub trait NearZero {
+  fn near_zero(&self) -> bool;
+}
+
+impl NearZero for Vec3 {
+  fn near_zero(&self) -> bool {
+    let s = 1e-8;
+    return self.x < s;
+  }
+}
+
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+  *v - 2.0 * (*v).dot(*n) * (*n)
 }

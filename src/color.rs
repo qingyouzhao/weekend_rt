@@ -1,6 +1,6 @@
 use crate::math::*;
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct Color(pub Vec3);
 
 #[derive(Default)]

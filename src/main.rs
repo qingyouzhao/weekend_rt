@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 extern crate image;
 use image::imageops::flip_vertical_in_place;
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{ImageBuffer, Rgb};
 use indicatif::ProgressBar;
 use rand::prelude::*;
 use rayon::prelude::*;
@@ -20,6 +20,7 @@ use crate::camera::*;
 use crate::color::*;
 use crate::hittable::{HitRecord, Hittable};
 use crate::hittable_list::HittableList;
+use crate::material::{Lambertian, Metal};
 use crate::math::*;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
@@ -30,8 +31,17 @@ fn ray_color(r: &Ray, world: Arc<dyn Hittable>, depth: u32) -> Vec3 {
   }
   let mut rec = HitRecord::default();
   if world.hit(&r, 0.001, INFINITY, &mut rec) {
-    let target = rec.p + rec.normal + Vec3::random_unit();
-    return 0.5 * ray_color(&Ray::new(&rec.p, &(target - rec.p)), world, depth - 1);
+    let mut scattered = Ray::default();
+    let mut attenuation = Vec3::zero();
+
+    if let Some(mat) = &rec.mat_rc {
+      if mat.scatter(&r, &rec, &mut attenuation, &mut scattered) {
+        // todo(zqy): Remove this recurssion to avoid stack overflow
+        return attenuation * ray_color(&scattered, world, depth - 1);
+      }
+    }
+
+    return Vec3::zero();
   }
   let unit_direction = r.direction().normalized();
   let t = 0.5 * (unit_direction.y + 1.0);
@@ -48,8 +58,31 @@ fn main() {
 
   // World
   let mut world = Arc::new(HittableList::default());
-  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(-Vec3::unit_z(), 0.5)));
-  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+  let material_ground = Arc::new(Lambertian::new(&Color(Vec3::new(0.8, 0.8, 0.0))));
+  let material_center = Arc::new(Lambertian::new(&Color(Vec3::new(0.7, 0.3, 0.3))));
+  let material_left = Arc::new(Metal::new(&Color(Vec3::new(0.8, 0.8, 0.8))));
+  let material_right = Arc::new(Metal::new(&Color(Vec3::new(0.8, 0.6, 0.2))));
+
+  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
+    Vec3::new(0.0, -100.5, -1.0),
+    100.0,
+    material_ground,
+  )));
+  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
+    Vec3::new(0.0, 0.0, -1.0),
+    0.5,
+    material_center.clone(),
+  )));
+  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
+    Vec3::new(-1.0, 0.0, -1.0),
+    0.5,
+    material_left.clone(),
+  )));
+  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
+    Vec3::new(1.0, 0.0, -1.0),
+    0.5,
+    material_right.clone(),
+  )));
 
   // Camera
   let cam = Camera::default();
