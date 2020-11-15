@@ -71,17 +71,17 @@ fn main() {
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
     Vec3::new(0.0, 0.0, -1.0),
     0.5,
-    material_center.clone(),
+    material_center,
   )));
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
     Vec3::new(-1.0, 0.0, -1.0),
     0.5,
-    material_left.clone(),
+    material_left,
   )));
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
     Vec3::new(1.0, 0.0, -1.0),
     0.5,
-    material_right.clone(),
+    material_right,
   )));
 
   // Camera
@@ -98,7 +98,7 @@ fn main() {
     (0..image_width).into_par_iter().for_each(|i| {
       let mut pixel_color = MultiSampleColor {
         color: Vec3::zero(),
-        samples_per_pixel: samples_per_pixel,
+        samples_per_pixel,
       };
 
       for _ in 0..pixel_color.samples_per_pixel {

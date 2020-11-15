@@ -21,10 +21,10 @@ impl Default for Camera {
       origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
     Camera {
-      origin: origin,
-      lower_left_corner: lower_left_corner,
-      horizontal: horizontal,
-      vertical: vertical,
+      origin,
+      lower_left_corner,
+      horizontal,
+      vertical,
     }
   }
 }
