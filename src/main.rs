@@ -1,4 +1,5 @@
 use std::env::current_dir;
+use std::f64::consts::PI;
 use std::f64::INFINITY;
 use std::sync::{Arc, Mutex};
 
@@ -52,47 +53,31 @@ fn ray_color(r: &Ray, world: Arc<dyn Hittable>, depth: u32) -> Vec3 {
 
 fn main() {
   // Image
-  let aspect_rasio = 16.0 / 9.0;
+  let aspect_ratio = 16.0 / 9.0;
   let image_width: u32 = 400;
-  let image_height: u32 = (image_width as f64 / aspect_rasio) as u32;
+  let image_height: u32 = (image_width as f64 / aspect_ratio) as u32;
   let samples_per_pixel = 100;
   let max_depth = 50;
 
   // World
+  let r = (PI / 4.0).cos();
   let mut world = Arc::new(HittableList::default());
-  let material_ground = Arc::new(Lambertian::new(&Color(Vec3::new(0.8, 0.8, 0.0))));
-  let material_center = Arc::new(Lambertian::new(&Color(Vec3::new(0.1, 0.2, 0.5))));
-  let material_left = Arc::new(Dielectric::new(1.5));
-  let material_right = Arc::new(Metal::new(&Color(Vec3::new(0.8, 0.6, 0.2)), 1.0));
-
+  let material_left = Arc::new(Lambertian::new(&Color(Vec3::new(0.0, 0.0, 1.0))));
+  let material_right = Arc::new(Lambertian::new(&Color(Vec3::new(1.0, 0.0, 0.0))));
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
-    Vec3::new(0.0, -100.5, -1.0),
-    100.0,
-    material_ground,
-  )));
-  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
-    Vec3::new(0.0, 0.0, -1.0),
-    0.5,
-    material_center,
-  )));
-  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
-    Vec3::new(-1.0, 0.0, -1.0),
-    0.5,
-    material_left.clone(),
-  )));
-  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
-    Vec3::new(-1.0, 0.0, -1.0),
-    -0.4,
+    Vec3::new(-r, 0.0, -1.0),
+    r,
     material_left,
   )));
+
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
-    Vec3::new(1.0, 0.0, -1.0),
-    0.5,
+    Vec3::new(r, 0.0, -1.0),
+    r,
     material_right,
   )));
 
   // Camera
-  let cam = Camera::default();
+  let cam = Camera::new(90.0, aspect_ratio);
 
   // Renderimg
   let arc_img = Arc::new(Mutex::new(ImageBuffer::<Rgb<u8>, Vec<_>>::new(
