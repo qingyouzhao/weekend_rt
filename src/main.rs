@@ -37,7 +37,7 @@ fn ray_color(r: &Ray, world: Arc<dyn Hittable>, depth: u32) -> Vec3 {
     if let Some(mat) = &rec.mat_rc {
       if mat.scatter(&r, &rec, &mut attenuation, &mut scattered) {
         // todo(zqy): Remove this recurssion to avoid stack overflow
-        return attenuation * ray_color(&scattered, world, depth - 1);
+        return attenuation * ray_color(&scattered, world.clone(), depth - 1);
       }
     }
 

@@ -23,6 +23,7 @@ impl Lambertian {
   }
 }
 
+// Something is wrong with this lanbertian reflection
 impl Material for Lambertian {
   fn scatter(
     &self,
