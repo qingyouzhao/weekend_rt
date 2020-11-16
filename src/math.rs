@@ -64,3 +64,34 @@ impl NearZero for Vec3 {
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
   *v - 2.0 * (*v).dot(*n) * (*n)
 }
+
+pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+  let cos_theta = (-uv.dot(*n)).min(1.0);
+  let r_out_perp = etai_over_etat * (*uv + cos_theta * (*n));
+  let r_out_parallel = (1.0 - r_out_perp.mag_sq()).abs().sqrt() * -1.0 * (*n);
+  r_out_perp + r_out_parallel
+}
+
+#[test]
+fn test_refract() {
+  let eta_air = 1.0;
+  let eta_glass = 1.5;
+  {
+    // Normal refract
+    let uv = Vec3::new(1.0, -1.0, 0.0).normalized();
+    let n = Vec3::new(0.0, 1.0, 0.0);
+    let scattered = refract(&uv, &n, eta_air / eta_air);
+    assert!((scattered - uv).mag_sq() < 1e-8);
+  }
+  {
+    let uv = Vec3::new(1.0, -1.0, 0.0).normalized();
+    let expected_scatter = Vec3 {
+      x: 0.4714045207910316,
+      y: -0.881917103688197,
+      z: 0.0,
+    };
+    let n = Vec3::new(0.0, 1.0, 0.0);
+    let scattered = refract(&uv, &n, eta_air / eta_glass);
+    assert!((scattered - expected_scatter).mag_sq() < 1e-8);
+  }
+}

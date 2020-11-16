@@ -20,7 +20,7 @@ use crate::camera::*;
 use crate::color::*;
 use crate::hittable::{HitRecord, Hittable};
 use crate::hittable_list::HittableList;
-use crate::material::{Lambertian, Metal};
+use crate::material::*;
 use crate::math::*;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
@@ -59,7 +59,7 @@ fn main() {
   // World
   let mut world = Arc::new(HittableList::default());
   let material_ground = Arc::new(Lambertian::new(&Color(Vec3::new(0.8, 0.8, 0.0))));
-  let material_center = Arc::new(Lambertian::new(&Color(Vec3::new(0.7, 0.3, 0.3))));
+  let material_center = Arc::new(Dielectric::new(1.5));
   let material_left = Arc::new(Metal::new(&Color(Vec3::new(0.8, 0.8, 0.8)), 0.3));
   let material_right = Arc::new(Metal::new(&Color(Vec3::new(0.8, 0.6, 0.2)), 1.0));
 
