@@ -76,6 +76,11 @@ fn main() {
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
     Vec3::new(-1.0, 0.0, -1.0),
     0.5,
+    material_left.clone(),
+  )));
+  Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
+    Vec3::new(-1.0, 0.0, -1.0),
+    -0.4,
     material_left,
   )));
   Arc::make_mut(&mut world).add(Arc::new(Sphere::new(
