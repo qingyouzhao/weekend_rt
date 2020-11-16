@@ -1,3 +1,4 @@
+use std::env::current_dir;
 use std::f64::INFINITY;
 use std::sync::{Arc, Mutex};
 
@@ -7,6 +8,7 @@ use image::{ImageBuffer, Rgb};
 use indicatif::ProgressBar;
 use rand::prelude::*;
 use rayon::prelude::*;
+use subprocess::Exec;
 
 mod camera;
 mod color;
@@ -125,6 +127,12 @@ fn main() {
     .into_inner()
     .expect("Why is my image still locked");
   flip_vertical_in_place(&mut final_img);
-  // flip_vertical_in_place(final_img);
-  final_img.save("test.png").unwrap();
+
+  let target_file = "test.png";
+  final_img.save(&target_file).unwrap();
+
+  let mut current_dir = current_dir().unwrap();
+  current_dir.push(&target_file);
+  let cmd = format!("start {}", current_dir.as_path().to_str().unwrap());
+  Exec::shell(cmd).join().unwrap();
 }
