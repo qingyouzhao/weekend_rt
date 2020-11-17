@@ -92,13 +92,21 @@ fn main() {
     material_right,
   )));
 
+  let lookfrom = Point::new(3.0, 3.0, 2.0);
+  let lookat = -Point::unit_z();
+  let vup = Vec3::unit_y();
+  let dist_to_focus = (lookfrom - lookat).mag();
+  let aperture = 2.0;
+
   // Camera
   let cam = Camera::new(
-    Point::new(-2.0, 2.0, 1.0),
-    -Point::unit_z(),
-    Vec3::unit_y(),
+    lookfrom,
+    lookat,
+    vup,
     20.0,
     aspect_ratio,
+    aperture,
+    dist_to_focus,
   );
 
   // Renderimg
